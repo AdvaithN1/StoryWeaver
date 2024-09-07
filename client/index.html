@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" id="*">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StoryWeaver</title>
+  <link rel="stylesheet" href="./css/style.css">
+  
+  <link rel="stylesheet" href="https://use.typekit.net/sej1wnw.css">
+</head>
+  <body>
+    <canvas id="canvas"> </canvas>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"
+      integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg=="
+      crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/CSSRulePlugin.min.js"
+      integrity="sha512-IxxYrSNXnt/RJlxNX40+7BQL88FLqvdpVpuV9AuvpNH/NFP0L8xA8WLxWTXx6PYExB5R/ktQisp6tIrnLn8xvw=="
+      crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <h1 id="title">StoryWeaver</h1>
+
+    <div id="desc">Create remarkable <span id="effect">stories</span> with powerful AI generation</div>
+
+    <div class="circle-cursor"></div>
+    
+    <script> 
+      const cursor = document.querySelector('.circle-cursor');
+
+      document.addEventListener('mousemove', (e) => {
+        cursor.style.top = `${e.clientY}px`;
+        cursor.style.left = `${e.clientX}px`;
+      }); 
+
+      document.addEventListener('click', (e) => {
+      const tl = gsap.timeline({});
+
+      tl.to('.circle-cursor', {
+        scale: 0.3,
+        opacity: 0.7,
+        ease: "expo.out",
+        duration: 0.1
+        });
+      tl.to('.circle-cursor', {
+        scale: 1,
+        opacity: 0.5,
+        ease: "ease.out",
+        duration: 0.1
+      });
+      });
+
+      const time = gsap.timeline({});
+
+      time.delay(0.2);
+
+      time.from('#title', {
+        opacity: 0.0,
+        y: 50,
+        ease: "expo.out",
+        duration: 1.0
+      });
+
+      time.from('#desc', {
+        opacity: 0.0,
+        y: 30,
+        ease: "expo.out",
+        duration: 1.0
+      });
+    
+    </script>
+
+    <script>
+      function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+
+
+      const text = document.getElementById('effect');
+      const anim = ["stories", "stor&nbsp;es", "s&nbsp;or&nbsp;es", "s&nbsp;or&nbsp;e ", "s&nbsp;&nbsp;r&nbsp;e ", "&nbsp;&nbsp;&nbsp;r&nbsp;e&nbsp;", "&nbsp;&nbsp;&nbsp;&nbsp;e&nbsp;&nbsp;", "       ", "       ", "       ", "       ", "p", "pr", "pre", "pres", 
+      "prese", "presen", "present", "presenta", "presentat", "presentati", "presentatio", "presentation", "presentations", "presentations", "presentations", "presentations", "presentations",
+      "pres ntations", "pres nta ions", "pres nta ion ", "p es nta ion ", "p es n a ion ", "p  s n a ion ", "p  s n a  on ", "p  s n a  o  ", "   s n a  o  ", "   s   a  o  ", "       a  o  ", 
+      "          o  ", "             ", 
+       ];
+      let index = 0;
+
+      function effect() {
+          text.textContent = anim[index]; // Set new text
+          index = (index + 1) % anim.length; // Cycle through texts
+      }
+
+      sleep(2000).then(() => { setInterval(effect, 100) });
+      
+
+
+    </script>
+    
+  </body>
+</html>

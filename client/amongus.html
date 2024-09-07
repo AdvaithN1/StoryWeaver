@@ -54,11 +54,14 @@ import {
     async function generateImage(prompt, index, title) {
         const theme = document.getElementById('theme').value;
         var encodedPrompt;
+        var shortened = await runChatSingle("Give an description to generate an image from for the following text from a story of title "+title+" in a short sentence: " + prompt)
+        shortened = shortened.text()
+        console.log("SHORTENED PARAGRAPH "+index+" TO: "+shortened);
         if(theme == "Children's Book" || theme == "Story") {
-          encodedPrompt = encodeURIComponent("Story image with title: "+title+". Further description: "+prompt+"Watercolor");
+          encodedPrompt = encodeURIComponent(shortened+"in the style of watercolor");
         }
         else{
-          encodedPrompt = encodeURIComponent("Story image with title: "+title+". Further description: "+prompt);
+          encodedPrompt = encodeURIComponent(shortened);
         }
         // Construct the full URL for image generation
         const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}`;
@@ -163,8 +166,54 @@ const MODEL_NAME = "gemini-1.0-pro";
       // Store each promise in the array
       finishedArrs.push(false);
       imagearrs.push('')
+    }
+    for (let i = 0; i < textarrs.length; i++) {
+      // Store each promise in the array
+      await new Promise(resolve => setTimeout(resolve, 1000));
       generateImage(textarrs[i], i, title);
     }
+  }
+
+  async function runChatSingle(prompt) {
+    const genAI = new GoogleGenerativeAI(API_KEY);
+    const model = genAI.getGenerativeModel({ model: MODEL_NAME });
+  
+    const generationConfig = {
+      temperature: 0.9,
+      topK: 1,
+      topP: 1,
+      maxOutputTokens: 2048,
+    };
+  
+    const safetySettings = [
+      {
+        category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+      {
+        category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+        threshold: HarmBlockThreshold.BLOCK_NONE,
+      },
+    ];
+  
+    const chat = model.startChat({
+      generationConfig,
+      safetySettings,
+      history: [
+      ],
+    });
+
+    const result = await chat.sendMessage(prompt);
+    const response = result.response;
+    return response
   }
 
   function checkArrayFullyTrue(arr) {
@@ -177,8 +226,25 @@ const MODEL_NAME = "gemini-1.0-pro";
 
 
 
+
+
+
+
+
+
+
+
+      document.getElementById("back1").textContent = textarrs[0];
       
-      
+      for (let count = 1; count < textarrs.length; count++) {
+        book.innerHTML += `<div class="page"><div class="front">${textarrs[count]}</div><div class="back" id="back1"><img src="${imgarrs[count - 1]}" /></div></div>`
+      } 
+      book.innerHTML += `<div class="page"><div class="front"><img src="${imgarrs[textarrs.length - 1]}" /></div><div class="back">End.</div></div>`
+
+
+
+
+
 
 
 
@@ -266,48 +332,8 @@ document.getElementById('submitBtnText').addEventListener('click', function() {
       <h1>Among Us</h1>
       <h3>1968.<br>69th edition</h3>
     </div>
-    <div class="back">
-      <h2>Lorem Ipsum</h2>
-      1. Lorem ipsum dolor sit amet consectetur adipisicing elit. Commodi, modi, perspiciatis molestias cum neque delectus eum eveniet repellat iusto totam magnam cupiditate quaerat quis.
-    </div>
-  </div>
-
-  <div class="page">
-    <div class="front">
-      2. Dolor Molestias aspernatur repudiandae sed quos debitis recusandae consectetur ab facilis voluptates sint vero eos, consequuntur delectus?
-    </div>
-    <div class="back">
-      <img src="https://picsum.photos/500/400" alt="Img 1">
-    </div>
-  </div>
-
-  <div class="page">
-    <div class="front">
-      <h2>Sit amet</h2>
-      4. Consectetur adipisicing elit. Dignissimos illo voluptate sapiente provident tempore ea voluptates perferendis tenetur eos nulla, doloribus! Distinctio a nostrum ipsum, adipisci at mollitia.
-    </div>
-    <div class="back">
-      5. Debitis recusandae consectetur ab facilis voluptates sint vero eos, consequuntur delectus temporibus harum dolorem provident eaque perferendis.
-    </div>
-  </div>
-
-  <div class="page">
-    <div class="front">
-      <h2>Consectetur</h2>
-      6. Adipisicing elit. Sed, fuga aspernatur? Numquam, molestias unde! Voluptatibus sint aspernatur qui dolore est itaque ipsum consequuntur neque asperiores non obcaecati harum, perspiciatis voluptate!
-    </div>
-    <div class="back">
-      7. Temporibus, eum nobis? Adipisci, a? Eaque vel amet ut reprehenderit.
-    </div>
-  </div>
-
-  <div class="page">
-    <div class="front">
-      <img src="https://picsum.photos/536/354" alt="Img 2">
-    </div>
-    <div class="back">
-      <h3>Finalis</h3>
-      9. Lorem ipsum dolor sit, amet consectetur adipisicing elit. code by Roko, eniam vero, magni dignissimos deleniti hic ratione sequi ullam eos.
+    <div class="back" id="back1">
+      among us!!!
     </div>
   </div>
 </div>

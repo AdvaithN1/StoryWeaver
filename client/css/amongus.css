@@ -5,23 +5,41 @@ body {
   margin: 0;
   display: flex;
   height: 100dvh;
-  perspective: 1000px;
-  font: 16px/1.4 sans-serif;
+  perspective: 3000px;
   /* overflow: hidden; */
   background-color: #232425;
+}
+
+body:before {
+  top: 0;
+  left: 0;
+}
+
+.relativeWrapper {
+  /* or any other parent wrapper */
+  margin: 0;
+  display: block;
+  position: fixed;
+  height: auto;
+  perspective: auto;
+  font: 16px/1.4 sans-serif;
+  /* overflow: hidden; */
+  background-color: transparent;
+  z-index: 1000;
 }
 
 .book {
   display: flex;
   margin: auto;
-  width: 300px;
+  width: 600px;
+  height: 600px;
   /*1* let pointer event go trough pages of lower Z than .book */
   pointer-events: none;
   transform-style: preserve-3d;
   transition: translate 1s;
   translate: calc(min(var(--c), 1) * 50%) 0%;
   /* DEMO ONLY: incline on the X axis for pages preview */
-  rotate: 1 0 0 30deg;
+  rotate: 1 0 0 12deg;
 }
 
 .page {
@@ -36,6 +54,7 @@ body {
   transform-style: preserve-3d;
   border: 1px solid #0008;
   transform-origin: left center;
+  font: 24px/1.4 sans-serif;
   transition:
     transform 1s,
     rotate 1s ease-in calc((min(var(--i), var(--c)) - max(var(--i), var(--c))) * 50ms);

@@ -10,22 +10,24 @@
 <body>
 
 
-  <label style="color:white;">Enter your theme
-    <input list="themes" name="myBrowser" id="theme"/></label>
-    <datalist id="themes">
-      <option value="Children's Book">
-      <option value="Story">
-      <option value="Lesson">
-    </datalist>
-  <br>
-    <textarea id="text" placeholder="Enter your prompt here..."></textarea>
+  <div class="relativeWrapper">
+    <label style="color:white;">Enter your theme
+      <input list="themes" name="myBrowser" id="theme"/></label>
+      <datalist id="themes">
+        <option value="Children's Book">
+        <option value="Story">
+        <option value="Lesson">
+      </datalist>
     <br>
-    <button id="submitBtnText">Submit</button>
-    <br>
-    <br>
-
-    <text id="textGemini" style="color:white;">Gemini input Response...</text>
-<div id="imageContainer"></div>
+      <textarea id="text" placeholder="Enter your prompt here...">Boy and dragon playing</textarea>
+      <br>
+      <button id="submitBtnText">Submit</button>
+      <br>
+      <br>
+  
+      <text id="textGemini" style="color:white;">Gemini input Response...</text>
+  <div id="imageContainer"></div>
+  </div>
 
 <script type="importmap">
     {
@@ -36,9 +38,11 @@
 </script>
 
 <script type="module">
+      const book = document.getElementsByClassName('book')[0];
+      book.style.display = "none";
 
-    var imagearrs = [];
     var textarrs = [];
+    var imagearrs = [];
 
 import {
     GoogleGenerativeAI,
@@ -46,9 +50,16 @@ import {
     HarmBlockThreshold,
   } from "@google/generative-ai"
 
-    async function generateImage(prompt, index) {
-        const encodedPrompt = encodeURIComponent(prompt);
-
+  var finishedArrs = [];
+    async function generateImage(prompt, index, title) {
+        const theme = document.getElementById('theme').value;
+        var encodedPrompt;
+        if(theme == "Children's Book" || theme == "Story") {
+          encodedPrompt = encodeURIComponent("Story image with title: "+title+". Further description: "+prompt+"Watercolor");
+        }
+        else{
+          encodedPrompt = encodeURIComponent("Story image with title: "+title+". Further description: "+prompt);
+        }
         // Construct the full URL for image generation
         const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}`;
         console.log('Image Generation URL:', imageUrl);
@@ -56,37 +67,43 @@ import {
         // Make the GET request to the image generator
         // return fetch(imageUrl);
     // })
-    fetch(imageUrl)
+    
+    return fetch(imageUrl)
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         // console.log(response);
+        // console.log(response.text());
         return response.blob(); // Get the response as a blob (binary data)
     })
     .then(blob => {
         // Create an object URL for the blob
         const imageBlobUrl = URL.createObjectURL(blob);
         console.log(blob)
+        
 
         // Create an img element and set its src attribute
         const img = document.createElement('img');
         img.src = imageBlobUrl;
+        imagearrs[index] = imageBlobUrl;
         img.alt = 'Generated Image';
         
         // Append the img element to the image container
         const imageContainer = document.getElementById('imageContainer');
         // imageContainer.innerHTML = ''; // Clear previous images
         const tex = document.createElement('text');
-        tex.innerText = "Image for paragraph number" + textarrs[index];
-        console.log("FINISHED GENERATING IMAGE FOR PARAGRAPH NUMBER", textarrs[index]);
+        tex.innerText = "Image for paragraph number" + index;
+        console.log("FINISHED GENERATING IMAGE FOR PARAGRAPH NUMBER", index);
         imageContainer.appendChild(tex);
         
         imageContainer.appendChild(img);
+        finishedArrs[index] = true;
     })
     .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
     });
+    
     }
 
 const MODEL_NAME = "gemini-1.0-pro";
@@ -131,17 +148,46 @@ const MODEL_NAME = "gemini-1.0-pro";
 
     const result = await chat.sendMessage(prompt);
     const response = result.response;
+    var resp2 = await chat.sendMessage("What is the title of the story?")
+    var title = resp2.response
     console.log(response.text());
     // await generateImage(response.text());
     document.getElementById('textGemini').innerText = response.text();
     textarrs = response.text().split('\n');
     console.log(textarrs);
+    console.log("TITLE: " + title);
+    
     textarrs = textarrs.filter(element => element !== "");
+
     for (let i = 0; i < textarrs.length; i++) {
-      generateImage(textarrs[i], i);
+      // Store each promise in the array
+      finishedArrs.push(false);
+      imagearrs.push('')
+      generateImage(textarrs[i], i, title);
     }
-    // generateImage(prompt);
   }
+
+  function checkArrayFullyTrue(arr) {
+    return arr.every(value => value === true);
+  }
+  const intervalId = setInterval(() => {
+    if (checkArrayFullyTrue(finishedArrs) && finishedArrs.length>0) {
+      console.log(finishedArrs);
+      console.log("FINISHED GENERATING ALL IMAGES");
+
+
+
+      
+      
+
+
+
+      book.style.display = "flex";
+      clearInterval(intervalId); // Stop the interval once condition is met
+    } else {
+      console.log("Not fully true yet...");
+    }
+  }, 1000);
 
 
 document.getElementById('submitBtnText').addEventListener('click', function() {
@@ -207,15 +253,18 @@ document.getElementById('submitBtnText').addEventListener('click', function() {
 
 
 
+
+
+
+
+
 <!-- YUFANS CORNER -->
 
-
-
-<div class="book">
+<div class="book" id="book">
   <div class="page">
     <div class="front">
-      <h1>FlipBook</h1>
-      <h3>2023.<br>Second edition</h3>
+      <h1>Among Us</h1>
+      <h3>1968.<br>69th edition</h3>
     </div>
     <div class="back">
       <h2>Lorem Ipsum</h2>
@@ -262,6 +311,7 @@ document.getElementById('submitBtnText').addEventListener('click', function() {
     </div>
   </div>
 </div>
+
 
 
 

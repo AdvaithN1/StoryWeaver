@@ -4,29 +4,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/amongus.css">
-    <title>GET Request Example</title>
+    <link rel="stylesheet" href="https://use.typekit.net/sej1wnw.css">
+    <title>Generate Stories</title>
     
 </head>
 <body>
 
-
   <div class="relativeWrapper">
-    <label style="color:white;">Enter your theme
-      <input list="themes" name="myBrowser" id="theme"/></label>
+    <div class="e">GENERATE ME A</div>
+    <label style="color:white;"></label>
+      <div class="theme-container">
+        <input list="themes" name="myBrowser" id="theme" class="i" style="padding-left: 30px;" placeholder="children's book"></input>
+      </div>
+      
+      
       <datalist id="themes">
-        <option value="Children's Book">
-        <option value="Story">
-        <option value="Lesson">
+        <option value="children's book">
+        <option value="short story">
+        <option value="nonfiction lesson">
       </datalist>
     <br>
-      <textarea id="text" placeholder="Enter your prompt here...">Boy and dragon playing</textarea>
+
+    <div class="e">ON THE TOPIC OF</div>
+      <textarea id="text" placeholder="Enter your prompt here..." class="i">a boy and a dragon</textarea>
       <br>
       <button id="submitBtnText">Submit</button>
       <br>
       <br>
   
-      <text id="textGemini" style="color:white;">Gemini input Response...</text>
+      <text id="textGemini" style="color:white;"></text>
+      <span class="loader"></span>
+
   <div id="imageContainer"></div>
+
   </div>
 
 <script type="importmap">
@@ -38,8 +48,8 @@
 </script>
 
 <script type="module">
-      const book = document.getElementsByClassName('book')[0];
-      book.style.display = "none";
+    const book = document.getElementsByClassName('book')[0];
+    book.style.display = "none";
 
     var textarrs = [];
     var imagearrs = [];
@@ -57,8 +67,8 @@ import {
         var shortened = await runChatSingle("Give an description to generate an image from for the following text from a story of title "+title+" in a short sentence: " + prompt)
         shortened = shortened.text()
         console.log("SHORTENED PARAGRAPH "+index+" TO: "+shortened);
-        if(theme == "Children's Book" || theme == "Story") {
-          encodedPrompt = encodeURIComponent(shortened+"in the style of watercolor");
+        if(theme == "children's book" || theme == "short story") {
+          encodedPrompt = encodeURIComponent(shortened+" in the style of watercolor");
         }
         else{
           encodedPrompt = encodeURIComponent(shortened);
@@ -71,7 +81,7 @@ import {
         // return fetch(imageUrl);
     // })
     
-    return fetch(imageUrl)
+    fetch(imageUrl)
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
@@ -87,21 +97,23 @@ import {
         
 
         // Create an img element and set its src attribute
-        const img = document.createElement('img');
-        img.src = imageBlobUrl;
+        // const img = document.createElement('img');
+        // img.src = imageBlobUrl;
         imagearrs[index] = imageBlobUrl;
-        img.alt = 'Generated Image';
+        // img.alt = 'Generated Image';
         
         // Append the img element to the image container
-        const imageContainer = document.getElementById('imageContainer');
+        // const imageContainer = document.getElementById('imageContainer');
         // imageContainer.innerHTML = ''; // Clear previous images
-        const tex = document.createElement('text');
-        tex.innerText = "Image for paragraph number" + index;
+        // const tex = document.createElement('text');
+        // tex.innerText = "Image for paragraph number" + index;
         console.log("FINISHED GENERATING IMAGE FOR PARAGRAPH NUMBER", index);
-        imageContainer.appendChild(tex);
+        // imageContainer.appendChild(tex);
         
-        imageContainer.appendChild(img);
+        // imageContainer.appendChild(img);
         finishedArrs[index] = true;
+        
+        document.getElementById("textGemini").textContent = "Finished generating image number "+arr.filter(Boolean).length;
     })
     .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
@@ -155,12 +167,14 @@ const MODEL_NAME = "gemini-1.0-pro";
     var title = resp2.response
     console.log(response.text());
     // await generateImage(response.text());
-    document.getElementById('textGemini').innerText = response.text();
     textarrs = response.text().split('\n');
     console.log(textarrs);
     console.log("TITLE: " + title);
     
     textarrs = textarrs.filter(element => element !== "");
+
+    document.getElementById('book_title').textContent = title.text();
+    document.getElementById('textGemini').innerText = "Loading...";
 
     for (let i = 0; i < textarrs.length; i++) {
       // Store each promise in the array
@@ -223,6 +237,7 @@ const MODEL_NAME = "gemini-1.0-pro";
     if (checkArrayFullyTrue(finishedArrs) && finishedArrs.length>0) {
       console.log(finishedArrs);
       console.log("FINISHED GENERATING ALL IMAGES");
+      document.getElementById('textGemini').innerText = "";
 
 
 
@@ -237,11 +252,22 @@ const MODEL_NAME = "gemini-1.0-pro";
       document.getElementById("back1").textContent = textarrs[0];
       
       for (let count = 1; count < textarrs.length; count++) {
-        book.innerHTML += `<div class="page"><div class="front">${textarrs[count]}</div><div class="back" id="back1"><img src="${imgarrs[count - 1]}" /></div></div>`
+        book.innerHTML += `<div class="page"><div class="front"><img src="${imagearrs[count - 1]}" /></div><div class="back">${textarrs[count]}</div></div>`
       } 
-      book.innerHTML += `<div class="page"><div class="front"><img src="${imgarrs[textarrs.length - 1]}" /></div><div class="back">End.</div></div>`
+      book.innerHTML += `<div class="page"><div class="front"><img src="${imagearrs[textarrs.length - 1]}" /></div><div class="back">The End.</div></div>`
 
+      const flipBook = (elBook) => {
+      elBook.style.setProperty("--c", 0); // Set current page
+      elBook.querySelectorAll(".page").forEach((page, idx) => {
+        page.style.setProperty("--i", idx);
+        page.addEventListener("click", (evt) => {
+          const curr = evt.target.closest(".back") ? idx : idx + 1;
+          elBook.style.setProperty("--c", curr);
+        });
+      });
+    };
 
+    document.querySelectorAll(".book").forEach(flipBook);
 
 
 
@@ -253,7 +279,7 @@ const MODEL_NAME = "gemini-1.0-pro";
     } else {
       console.log("Not fully true yet...");
     }
-  }, 1000);
+  }, 2000);
 
 
 document.getElementById('submitBtnText').addEventListener('click', function() {
@@ -329,8 +355,8 @@ document.getElementById('submitBtnText').addEventListener('click', function() {
 <div class="book" id="book">
   <div class="page">
     <div class="front">
-      <h1>Among Us</h1>
-      <h3>1968.<br>69th edition</h3>
+      <h1 id="book_title">Among Us</h1>
+      <h3>1968.<br>1st edition</h3>
     </div>
     <div class="back" id="back1">
       among us!!!
@@ -342,21 +368,6 @@ document.getElementById('submitBtnText').addEventListener('click', function() {
 
 
 
-
-<script>
-  const flipBook = (elBook) => {
-  elBook.style.setProperty("--c", 0); // Set current page
-  elBook.querySelectorAll(".page").forEach((page, idx) => {
-    page.style.setProperty("--i", idx);
-    page.addEventListener("click", (evt) => {
-      const curr = evt.target.closest(".back") ? idx : idx + 1;
-      elBook.style.setProperty("--c", curr);
-    });
-  });
-};
-
-document.querySelectorAll(".book").forEach(flipBook);
-</script>
 
 </body>
 </html>

@@ -1,4 +1,8 @@
 * { box-sizing: border-box; }
+@font-face {
+  font-family: "hatch-sans", sans-serif;
+  src: url("https://use.typekit.net/sej1wnw.css");
+}
 
 body {
   /* or any other parent wrapper */
@@ -6,8 +10,8 @@ body {
   display: flex;
   height: 100dvh;
   perspective: 3000px;
-  /* overflow: hidden; */
-  background-color: #232425;
+  overflow: hidden;
+  background-color: #111217;
 }
 
 body:before {
@@ -15,17 +19,49 @@ body:before {
   left: 0;
 }
 
+.e {
+  font-family: "hatch-sans", sans-serif;
+  font-size: 60px;
+  text-align: center;
+  color: white;
+}
+.i {
+  font-family: "hatch-sans", sans-serif;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  font-size: 50px;
+  width: 700px;
+  text-align: center;
+  color: #0000ff;
+}
+.theme-container {
+  border-radius: 10%;
+}
+
+#theme {
+  background-color: transparent;
+  border: none;
+  padding: none;
+  appearance: none;
+}
+
+
 .relativeWrapper {
   /* or any other parent wrapper */
   margin: 0;
   display: block;
+  width: 100dvw;
   position: fixed;
-  height: auto;
+  align-items: center;
+  align-content: center;
+  padding-top: 5vh;
+  text-align: center;
+  height: 100dvh;
   perspective: auto;
   font: 16px/1.4 sans-serif;
-  /* overflow: hidden; */
+  overflow: hidden;
   background-color: transparent;
-  z-index: 1000;
+  z-index: -1;
 }
 
 .book {

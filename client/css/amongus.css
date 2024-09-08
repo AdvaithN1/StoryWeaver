@@ -33,6 +33,10 @@ body:before {
   width: 700px;
   text-align: center;
   color: #0000ff;
+  background-color: transparent;
+  border: none;
+  padding: none;
+  appearance: none;
 }
 .theme-container {
   border-radius: 10%;
@@ -44,6 +48,25 @@ body:before {
   padding: none;
   appearance: none;
 }
+
+#submitBtnText {
+    font-family: "hatch-sans", sans-serif;
+    font-size: 24px;
+    background-color: #0000ff;
+    color: black;
+    position: absolute;
+    top: 700px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    width: 160px;
+    height: 60px;
+  
+    border-radius: 20px;
+    padding: 0;
+    border: none;
+    z-index: 5000;
+  }
 
 
 .relativeWrapper {
@@ -79,7 +102,7 @@ body:before {
 }
 
 .page {
-  --thickness: 5;
+  --thickness: 10;
   /* PS: Don't go below thickness 0.4 or the pages might transpare */
   flex: none;
   display: flex;
